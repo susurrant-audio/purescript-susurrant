@@ -2,17 +2,21 @@ module Susurrant.MultivariateGaussian
   ( MultivariateGaussian
   , multivariateGaussian
   , multivariateGaussian'
+  , getMean
+  , getCovariance
+  , sample
+  , GAUSS
   ) where
 
 import Prelude
 import Control.Monad.Error.Class
+import Control.Monad.Eff
 import Control.Monad.Except.Trans
 import Data.Array
 import Data.Either
 import Data.Maybe
 import Susurrant.Matrix
 import Susurrant.Types
-import Control.Monad.Trans (lift)
 
 newtype MultivariateGaussian = MultivariateGaussian
   { mean :: Array Number
@@ -31,3 +35,19 @@ multivariateGaussian m covariance = do
 
 multivariateGaussian' :: Array Number -> Matrix Number -> Either MathError MultivariateGaussian
 multivariateGaussian' = multivariateGaussian
+
+getMean :: MultivariateGaussian -> Array Number
+getMean (MultivariateGaussian {mean, covariance}) = mean
+
+getCovariance :: MultivariateGaussian -> Matrix Number
+getCovariance (MultivariateGaussian {mean, covariance}) = covariance
+
+sample :: forall eff. MultivariateGaussian -> Eff (gauss :: GAUSS | eff) (Array Number)
+sample = sample_ <<< toSampler_
+
+foreign import data GAUSS :: !
+foreign import data JSMultivariateNormal :: *
+
+foreign import toSampler_ :: MultivariateGaussian -> JSMultivariateNormal
+
+foreign import sample_ :: forall eff. JSMultivariateNormal -> Eff (gauss :: GAUSS | eff) (Array Number)
