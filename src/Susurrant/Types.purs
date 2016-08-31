@@ -1,5 +1,14 @@
-module Susurrant.Types where
+module Susurrant.Types
+  ( MatrixError(..)
+  , GaussianError(..)
+  , MathError(..)
+  ) where
 
-import Prelude
+data MatrixError = RowsNotEqualSize
 
-newtype Matrix a = Matrix { unMatrix :: Array (Array a) }
+data GaussianError = NonSquareCovariance
+                   | EmptyCovariance
+                   | CovarianceNotSameSizeAsMean
+
+data MathError = GaussError GaussianError
+               | MatError MatrixError

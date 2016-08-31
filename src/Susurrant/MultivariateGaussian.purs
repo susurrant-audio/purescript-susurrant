@@ -1,28 +1,33 @@
 module Susurrant.MultivariateGaussian
   ( MultivariateGaussian
+  , multivariateGaussian
+  , multivariateGaussian'
   ) where
 
 import Prelude
--- import Control.Applicative
 import Control.Monad.Error.Class
+import Control.Monad.Except.Trans
 import Data.Array
+import Data.Either
 import Data.Maybe
+import Susurrant.Matrix
 import Susurrant.Types
+import Control.Monad.Trans (lift)
 
 newtype MultivariateGaussian = MultivariateGaussian
   { mean :: Array Number
   , covariance :: Matrix Number
   }
 
-data GaussianError = NonSquareCovariance
-                   | EmptyCovariance
-                   | CovarianceNotSameSizeAsMean
-
-multivariateGaussian :: forall m. (MonadError GaussianError m) => Array Number -> Matrix Number -> m MultivariateGaussian
-multivariateGaussian m (Matrix {unMatrix: cov}) = do
+multivariateGaussian :: forall m. (MonadError MathError m) => Array Number -> Matrix Number -> m MultivariateGaussian
+multivariateGaussian m covariance = do
   let meanSize = length m
+      cov = unMatrix covariance
       covN = length cov
-  when (covN /= meanSize) (throwError CovarianceNotSameSizeAsMean)
-  covM <- maybe (throwError EmptyCovariance) pure (map length (head cov))
-  when (covM /= covN) (throwError NonSquareCovariance)
-  pure $ MultivariateGaussian { mean: m, covariance: Matrix {unMatrix: cov} }
+  when (covN /= meanSize) (throwError (GaussError CovarianceNotSameSizeAsMean))
+  covM <- maybe (throwError (GaussError EmptyCovariance)) pure (map length (head cov))
+  when (covM /= covN) (throwError (GaussError NonSquareCovariance))
+  pure $ MultivariateGaussian { mean: m, covariance: covariance }
+
+multivariateGaussian' :: Array Number -> Matrix Number -> Either MathError MultivariateGaussian
+multivariateGaussian' = multivariateGaussian
