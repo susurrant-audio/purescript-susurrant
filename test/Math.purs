@@ -52,11 +52,12 @@ dimensionsSpec =
 gaussianSpec =
  describe "MultivariateGaussian" $ do
     it "has a mean and a covariance matrix of the same size" $
-      quickCheck $ (\(Tuple (ArbMatrix cov) mean) -> let dim = dimensions cov
+      quickCheck $ (\(Tuple (ArbSquare cov) mean) -> let dim = dimensions cov
+                                                         isSquare = dim.rows == dim.cols
                                                          mg = multivariateGaussian' mean cov
-                                                     in isRight mg === true)
+                                                     in isRight mg === (isSquare && length mean == dim.rows))
 
 mathSpec = do
   matrixRowSpec
   dimensionsSpec
-  -- gaussianSpec
+  gaussianSpec
