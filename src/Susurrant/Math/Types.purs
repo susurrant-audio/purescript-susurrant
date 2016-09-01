@@ -1,4 +1,4 @@
-module Susurrant.Types
+module Susurrant.Math.Errors
   ( MatrixError(..)
   , GaussianError(..)
   , MathError(..)

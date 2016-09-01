@@ -1,4 +1,4 @@
-module Susurrant.Matrix
+module Susurrant.Math.Matrix
   ( Matrix
   , unMatrix
   , matrix
@@ -7,7 +7,7 @@ module Susurrant.Matrix
   ) where
 
 import Prelude
-import Susurrant.Types
+import Susurrant.Math.Errors
 import Data.Array
 import Data.Either
 import Data.Foldable (any)
