@@ -1,6 +1,7 @@
 module Test.Math where
 
 import Prelude
+import Data.Traversable (for)
 import Control.Monad.Eff.Class
 import Data.Array
 import Data.Either
@@ -10,7 +11,8 @@ import Susurrant.MultivariateGaussian
 import Susurrant.Matrix
 import Data.Tuple
 import Data.Maybe (fromMaybe)
-import Data.Unfoldable (replicate)
+import Data.Unfoldable (class Unfoldable, replicate)
+import Data.List.Lazy (replicateM)
 import Test.QuickCheck ((===), (/==), (<?>))
 import Test.QuickCheck.Gen (chooseInt, vectorOf, uniform)
 import Test.Spec (describe, it, pending)
@@ -73,6 +75,18 @@ gaussianSpec =
         Right gauss' -> do
           x <- liftEff $ sample gauss'
           length x `shouldEqual` length mean
+    it "can be sampled a large number of times" do
+      let mean = [0.0, 0.0]
+          gauss = do covariance <- matrix' [[1.0, 0.0], [0.0, 1.0]]
+                     multivariateGaussian' mean covariance
+      case gauss of
+        Left err -> true `shouldEqual` false
+        Right gauss' -> do
+          xs <- liftEff $ replicateM 100 (sample gauss')
+          for xs $ \x ->
+            length x `shouldEqual` length mean
+          pure unit
+
 
 mathSpec = do
   matrixRowSpec
