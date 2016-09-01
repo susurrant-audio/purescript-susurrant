@@ -7,7 +7,7 @@ import Susurrant.Components.Effects (AppEffects)
 import Pux (noEffects, mapEffects, mapState, EffModel)
 import App.NotFound as NotFound
 import App.Routes (Route(Home, NotFound))
-import Prelude (($), map)
+import Prelude (($), map, pure)
 import Pux.Html (Html, div, h1, p, text)
 
 data Action
@@ -25,6 +25,10 @@ init =
 
 
 update :: Action -> State -> EffModel State Action AppEffects
+update (PageView Home) state =
+  { state: state { route = Home }
+  , effects: [ pure (GaussView ShowGauss.Resample) ]
+  }
 update (PageView route) state = noEffects $ state { route = route }
 update (GaussView action) state =
   mapEffects GaussView (mapState (state { gauss = _ }) $ ShowGauss.update action state.gauss)
