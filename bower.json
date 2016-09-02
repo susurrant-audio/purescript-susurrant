@@ -10,7 +10,8 @@
   "dependencies": {
     "purescript-pux": "^5.0.1",
     "purescript-pux-devtool": "^3.0.0",
-    "purescript-arrays": "^1.1.0"
+    "purescript-arrays": "^1.1.0",
+    "purescript-d3": "https://github.com/pelotom/purescript-d3"
   },
   "devDependencies": {
     "purescript-spec": "^0.8.0",
